@@ -34,6 +34,10 @@ function customerPrompt(){
     if (checkProduct(answer.itemId) < answer.buyQuantity){
       console.log("Not enough product. Sorry!");
       customerPrompt();
+    } 
+    else {
+      buyProduct();
+      customerReceipt();
     }
     ;
   })
@@ -52,6 +56,18 @@ function checkProduct(itemId){
 function buyProduct(id, itemQuantity){
 
   connection.query()
+}
+
+function customerReceipt(itemId, quantity){
+  connection.query("SELECT * FROM products WHERE item_id = ?", [itemId], function(err, result){
+    if (err) throw err;
+    let price = result[0].price * quantity;
+    let itemName = result[0].product_name;
+    console.log(`Item Name: ${itemName}`);
+    console.log(`Quantity Purchased: ${quantity}`);
+    console.log(`Total Purchase Price: ${price}`);
+
+  })
 }
 
 
