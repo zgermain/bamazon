@@ -71,16 +71,16 @@ function customerPrompt(){
   .then(function(answer){
 
     
-    // console.log(checkProduct(answer.itemId));
+    console.log(checkProduct(answer.itemId));
     
 
-    // if (checkProduct(answer.itemId) < answer.buyQuantity){
-    //   console.log("Not enough product. Sorry!");
-    //   customerPrompt();
-    // } 
-    // else {
-    //   buyProduct(answer.itemId, answer.buyQuantity);
-    //   customerReceipt(answer.itemId, answer.buyQuantity);
+    if (checkProduct(answer.itemId) < answer.buyQuantity){
+      console.log("Not enough product. Sorry!");
+      customerPrompt();
+    } 
+    else {
+      buyProduct(answer.itemId, answer.buyQuantity);
+      customerReceipt(answer.itemId, answer.buyQuantity);
     }
     ;
   })
