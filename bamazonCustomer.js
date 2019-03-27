@@ -71,47 +71,67 @@ function customerPrompt(){
   .then(function(answer){
 
     
-    console.log(checkProduct(answer.itemId));
+    var buyQuantity = answer.buyQuantity;
+    var itemId = answer.itemId;
+
+    buyProduct(itemId, buyQuantity);
+    // console.log(checkProduct(answer.itemId));
     
 
-    if (checkProduct(answer.itemId) < answer.buyQuantity){
-      console.log("Not enough product. Sorry!");
-      customerPrompt();
-    } 
-    else {
-      buyProduct(answer.itemId, answer.buyQuantity);
-      customerReceipt(answer.itemId, answer.buyQuantity);
-    }
-    ;
+    // if (checkProduct(answer.itemId) < answer.buyQuantity){
+    //   console.log("Not enough product. Sorry!");
+    //   customerPrompt();
+    // } 
+    // else {
+    //   buyProduct(answer.itemId, answer.buyQuantity);
+    //   customerReceipt(answer.itemId, answer.buyQuantity);
+    // }
+    // ;
   })
 
 }
 
-function buyProduct(itemId, itemQuantity){
-  connection.query("UPDATE products SET ? WHERE ?",[
-    {
-      stock_quantity: stock_quantity - itemQuantity
-    },
-    {
-      item_id: itemId
-    }
-  ], function(err){
-    if (err) throw err;
-    console.log("Bamazon DB updated")
-  })
-}
+function buyProduct(itemId, buyQuantity){
 
-function customerReceipt(itemId, quantity){
   connection.query("SELECT * FROM products WHERE item_id = ?", [itemId], function(err, result){
     if (err) throw err;
-    let price = result[0].price * quantity;
-    let itemName = result[0].product_name;
-    console.log(`Item Name: ${itemName}`);
-    console.log(`Quantity Purchased: ${quantity}`);
-    console.log(`Total Purchase Price: ${price}`);
-
+    if (buyQuantity <= result[0].stock_quantity){
+      var cost = result[0].price * buyQuantity;
+      console.log("Order up!")
+      console.log(`Total Cost for your order (${buyQuantity} X ${result[0].product_name}) is $${cost}.`)
+      connection.query(`UPDATE products SET stock_quantity = stock_quantity - ${buyQuantity} WHERE item_id = ${itemId}`)
+    } else {
+      console.log(`Oh no! Our stock of ${result[0].product_name} is too low!`);
+      
+    }
+    showProducts();
   })
+    
+
+  // connection.query("UPDATE products SET ? WHERE ?",[
+  //   {
+  //     stock_quantity: stock_quantity - itemQuantity
+  //   },
+  //   {
+  //     item_id: itemId
+  //   }
+  // ], function(err){
+  //   if (err) throw err;
+  //   console.log("Bamazon DB updated")
+  // })
 }
+
+// function customerReceipt(itemId, quantity){
+//   connection.query("SELECT * FROM products WHERE item_id = ?", [itemId], function(err, result){
+//     if (err) throw err;
+//     let price = result[0].price * quantity;
+//     let itemName = result[0].product_name;
+//     console.log(`Item Name: ${itemName}`);
+//     console.log(`Quantity Purchased: ${quantity}`);
+//     console.log(`Total Purchase Price: ${price}`);
+
+//   })
+// }
 
 showProducts();
 
