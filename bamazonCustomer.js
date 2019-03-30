@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const numeral = require("numeral")
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -18,11 +19,12 @@ var connection = mysql.createConnection({
 function showProducts(){
   connection.query('SELECT * FROM products', function(err, result) {
     if (err) throw err;
-    var products = result
 
     console.log('-----------------')
     for (i=0; i< result.length; i++) {
-      console.log(`ID:${result[i].item_id} - Product Name:${result[i].product_name} -  Dept Name:${result[i].department_name} - Price: $${result[i].price} - Stock: ${result[i].stock_quantity}`)
+      var price = numeral(result[i].price).format('$0,0.00')
+      var stockQuantity = numeral(result[i].stock_quantity).format('0,0')
+      console.log(`ID: ${result[i].item_id} - ${price} - ${result[i].product_name} -  ${stockQuantity} available in ${result[i].department_name} dept.`)
     } 
     console.log('-----------------')
 
@@ -30,7 +32,6 @@ function showProducts(){
   })
 
 }
-
 
 
 function checkProduct(itemId){
@@ -96,9 +97,16 @@ function buyProduct(itemId, buyQuantity){
   connection.query("SELECT * FROM products WHERE item_id = ?", [itemId], function(err, result){
     if (err) throw err;
     if (buyQuantity <= result[0].stock_quantity){
-      var cost = result[0].price * buyQuantity;
+      var cost = numeral(result[0].price * buyQuantity).format('$0,0.00');
+      console.log("--------------------------------------")
+      console.log("")
       console.log("Order up!")
-      console.log(`Total Cost for your order (${buyQuantity} X ${result[0].product_name}) is $${cost}.`)
+      console.log("")
+      console.log(`Total Cost for your order (${buyQuantity} X ${result[0].product_name}) is ${cost}.`)
+      console.log("")
+      console.log("")
+      console.log("")
+      console.log("--------------------------------------")
       connection.query(`UPDATE products SET stock_quantity = stock_quantity - ${buyQuantity} WHERE item_id = ${itemId}`)
     } else {
       console.log(`Oh no! Our stock of ${result[0].product_name} is too low!`);
